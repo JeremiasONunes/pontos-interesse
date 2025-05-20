@@ -14,47 +14,33 @@ class _AddPointPageState extends State<AddPointPage> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
-
-  double? latitude;
-  double? longitude;
-  bool isLoadingLocation = false;
-
-  void _getLocation() async {
-    setState(() => isLoadingLocation = true);
-    try {
-      final location = await context.read<PointBloc>().getCurrentLocation();
-      setState(() {
-        latitude = location.latitude;
-        longitude = location.longitude;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Erro ao obter localização: $e')));
-    } finally {
-      setState(() => isLoadingLocation = false);
-    }
-  }
+  final _latController = TextEditingController();
+  final _lonController = TextEditingController();
 
   void _savePoint() {
-    if (_formKey.currentState!.validate() &&
-        latitude != null &&
-        longitude != null) {
+    if (_formKey.currentState!.validate()) {
+      final lat = double.tryParse(_latController.text);
+      final lon = double.tryParse(_lonController.text);
+
+      if (lat == null || lon == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Latitude e longitude inválidas.')),
+        );
+        return;
+      }
+
       final point = PointEntity(
         name: _nameController.text,
         description: _descController.text,
-        latitude: latitude!,
-        longitude: longitude!,
+        latitude: lat,
+        longitude: lon,
       );
 
       context.read<PointBloc>().add(AddPointEvent(point));
-
-      Navigator.pop(context); // volta para Home
+      Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Preencha todos os campos e obtenha a localização.'),
-        ),
+        const SnackBar(content: Text('Preencha todos os campos corretamente.')),
       );
     }
   }
@@ -88,20 +74,31 @@ class _AddPointPageState extends State<AddPointPage> {
                             : null,
               ),
               const SizedBox(height: 16),
-              Row(
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: isLoadingLocation ? null : _getLocation,
-                    icon: const Icon(Icons.my_location),
-                    label: const Text('Obter localização'),
-                  ),
-                  const SizedBox(width: 12),
-                  if (latitude != null && longitude != null)
-                    Text(
-                      '(${latitude!.toStringAsFixed(4)}, ${longitude!.toStringAsFixed(4)})',
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                ],
+              TextFormField(
+                controller: _latController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  signed: true,
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Latitude'),
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Informe a latitude'
+                            : null,
+              ),
+              TextFormField(
+                controller: _lonController,
+                keyboardType: const TextInputType.numberWithOptions(
+                  signed: true,
+                  decimal: true,
+                ),
+                decoration: const InputDecoration(labelText: 'Longitude'),
+                validator:
+                    (value) =>
+                        value == null || value.isEmpty
+                            ? 'Informe a longitude'
+                            : null,
               ),
               const Spacer(),
               ElevatedButton.icon(
