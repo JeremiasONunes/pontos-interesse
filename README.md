@@ -59,6 +59,26 @@ cd pontos_de_interesse
 - Preencha o formulário com nome, descrição, latitude e longitude.
 - Salve para atualizar a lista.
 
+## telas do aplicativo quando instalado
+
+- tela inicial do aplicativo
+
+![alt](./tela%20inicial.jpg)
+
+- tela de coordenadas
+
+![alt](./tela%20para%20adicionar%20coordenadas.jpg)
+
+- tela adicionando coordenadas exemplo
+
+![alt](./adicionando%20coordenandas.jpg)
+
+- tela com a distancia
+
+![alt](./tela%20com%20distancia.jpg)
+
+
+
 ## Observações
 
 - A localização do usuário é obtida via `GetCurrentLocation` (a implementação depende da plataforma e permissões).
